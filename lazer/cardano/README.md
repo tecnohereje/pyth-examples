@@ -13,6 +13,23 @@ A modern web application demonstrating the integration of **Pyth Network** on-ch
 
 This project is a full-stack application that enables real-time commercial operations (e.g., product purchases) using verified ADA/USD price data from the Pyth Network. It ensures that payments made in ADA correctly reflect a USD-denominated price at the moment of the transaction, verified both off-chain (convenience) and on-chain (security).
 
+<img width="671" height="982" alt="Screenshot 2026-03-22 at 20 51 26" src="https://github.com/user-attachments/assets/f3b920e7-b688-4578-95b2-c0e8e2724dcf" />
+
+
+<img width="654" height="959" alt="Screenshot 2026-03-22 at 20 51 39" src="https://github.com/user-attachments/assets/e8e06c64-55d4-4bcd-a924-fa2bee5aa03e" />
+
+
+<img width="651" height="988" alt="Screenshot 2026-03-22 at 20 51 47" src="https://github.com/user-attachments/assets/950d28cd-1ac7-46df-9fa0-7558850960cd" />
+
+<img width="655" height="975" alt="Screenshot 2026-03-22 at 20 51 56" src="https://github.com/user-attachments/assets/e52afbdd-729e-4056-bc4d-91a06c7dcf4a" />
+
+<img width="655" height="932" alt="Screenshot 2026-03-22 at 20 52 09" src="https://github.com/user-attachments/assets/4cc3056d-a96b-4fff-a77e-725347b24908" />
+
+<img width="1449" height="979" alt="Screenshot 2026-03-22 at 20 52 52" src="https://github.com/user-attachments/assets/b1e7c6a4-b5b0-4d07-9c94-2e47a1d75fa5" />
+
+<img width="667" height="994" alt="Screenshot 2026-03-22 at 20 53 12" src="https://github.com/user-attachments/assets/68012e38-5b31-4b9c-9b17-c8f7d9cadddf" />
+
+
 ### Key Features
 - **On-Chain Price Verification:** Uses Pyth Lazer to fetch signed price updates and verifies them within a Plutus V3 smart contract.
 - **Cardano Wallet Integration:** Support for CIP-30 compatible wallets (Nami, Eternl, Lace, etc.) via the Evolution SDK.
