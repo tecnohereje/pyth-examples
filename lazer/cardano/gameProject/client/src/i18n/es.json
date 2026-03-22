@@ -1,0 +1,12 @@
+{
+  "nav": {
+    "home": "Inicio",
+    "missions": "Misiones",
+    "store": "Tienda",
+    "profile": "Perfil"
+  },
+  "home": {
+    "title": "Bienvenido a Pythathon",
+    "subtitle": "Completa misiones, gana javitos, obtén descuentos reales."
+  }
+}

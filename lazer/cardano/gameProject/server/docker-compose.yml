@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgis/postgis:16-3.4
+    container_name: pythathon-db
+    environment:
+      POSTGRES_USER: pythathon_user
+      POSTGRES_PASSWORD: pythathon_password
+      POSTGRES_DB: pythathon_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+volumes:
+  postgres_data:

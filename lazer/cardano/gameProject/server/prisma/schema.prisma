@@ -1,0 +1,189 @@
+// Prisma schema configurado para SQLite (Desarrollo).
+// ATENCIÓN ⚠️: PostgreSQL + PostGIS sigue siendo lo óptimo para producción por la necesidad de queries geoespaciales.
+// Para cambiar a PostgreSQL: 
+// 1. Cambia provider = "postgresql"
+// 2. Restaura los ENUMs si es necesario.
+// 3. Apunta DATABASE_URL a la instancia de Postgres en .env.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id              String   @id @default(uuid())
+  email           String   @unique
+  passwordHash    String
+  displayName     String
+  avatarUrl       String?
+  role            String   @default("PLAYER") // Tipos: ADMIN, MERCHANT, LOCATION_MANAGER, PLAYER
+  javitosBalance  Int      @default(0)
+  walletAddress   String?  @unique
+  language        String   @default("es")
+  theme           String   @default("light")
+  pushSubString   String?  // JSON stringificado de la suscripción Web Push
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  merchant        Merchant?
+  missionsCreated Mission[] @relation("MissionCreator")
+  missionProgress MissionProgress[]
+  orders          Order[]
+  notifications   Notification[]
+}
+
+model Merchant {
+  id             String   @id @default(uuid())
+  userId         String   @unique
+  businessName   String
+  walletAddress  String
+  
+  user           User     @relation(fields: [userId], references: [id])
+  locations      Location[]
+  products       Product[]
+}
+
+model Location {
+  id           String   @id @default(uuid())
+  merchantId   String
+  name         String
+  description  String?
+  latitude     Float
+  longitude    Float
+  radiusMeters Int      @default(50)
+  isActive     Boolean  @default(true)
+  address      String?
+
+  merchant     Merchant @relation(fields: [merchantId], references: [id])
+  objectives   MissionObjective[]
+}
+
+model Mission {
+  id                 String   @id @default(uuid())
+  titleEs            String
+  titleEn            String
+  descriptionEs      String
+  descriptionEn      String
+  type               String   // MAIN, SIDE, DAILY
+  javitosReward      Int
+  timeLimitMinutes   Int?
+  cooldownMinutes    Int?
+  isGroup            Boolean  @default(false)
+  maxParticipants    Int?
+  status             String   @default("DRAFT") // DRAFT, ACTIVE, ARCHIVED
+  createdBy          String
+  createdAt          DateTime @default(now())
+
+  creator            User     @relation("MissionCreator", fields: [createdBy], references: [id])
+  objectives         MissionObjective[]
+  progress           MissionProgress[]
+  dependsOn          MissionDependency[] @relation("MissionDependencies")
+  dependedBy         MissionDependency[] @relation("DependentMissions")
+}
+
+model MissionDependency {
+  missionId             String
+  dependsOnMissionId    String
+
+  mission           Mission @relation("MissionDependencies", fields: [missionId], references: [id])
+  dependsOnMission  Mission @relation("DependentMissions", fields: [dependsOnMissionId], references: [id])
+
+  @@id([missionId, dependsOnMissionId])
+}
+
+model MissionObjective {
+  id            String   @id @default(uuid())
+  missionId     String
+  type          String   // GEOLOCATION, QR_SCAN, PHOTO, PURCHASE
+  locationId    String?
+  descriptionEs String
+  descriptionEn String
+  orderIndex    Int      @default(0)
+
+  mission       Mission  @relation(fields: [missionId], references: [id])
+  location      Location? @relation(fields: [locationId], references: [id])
+  progress      ObjectiveProgress[]
+}
+
+model MissionProgress {
+  id            String   @id @default(uuid())
+  userId        String
+  missionId     String
+  status        String   // ACCEPTED, IN_PROGRESS, COMPLETED, EXPIRED
+  startedAt     DateTime @default(now())
+  completedAt   DateTime?
+
+  user          User     @relation(fields: [userId], references: [id])
+  mission       Mission  @relation(fields: [missionId], references: [id])
+  objectives    ObjectiveProgress[]
+}
+
+model ObjectiveProgress {
+  id                String   @id @default(uuid())
+  missionProgressId String
+  objectiveId       String
+  isCompleted       Boolean  @default(false)
+  evidenceUrl       String?
+  completedAt       DateTime?
+
+  missionProgress   MissionProgress @relation(fields: [missionProgressId], references: [id])
+  objective         MissionObjective @relation(fields: [objectiveId], references: [id])
+}
+
+model Product {
+  id                  String   @id @default(uuid())
+  merchantId          String
+  nameEs              String
+  nameEn              String
+  descriptionEs       String
+  descriptionEn       String
+  priceUsd            Float
+  javitosRequired     Int
+  discountPercentage  Float
+  stock               Int
+  imageUrl            String?
+  isActive            Boolean  @default(true)
+
+  merchant            Merchant @relation(fields: [merchantId], references: [id])
+  orders              Order[]
+}
+
+model Order {
+  id                   String   @id @default(uuid())
+  userId               String
+  productId            String
+  quantity             Int      @default(1)
+  priceAdaAtPurchase   Float
+  priceUsdAtPurchase   Float
+  javitosUsed          Int
+  discountApplied      Float
+  txHash               String?
+  escrowStatus         String   // PENDING, LOCKED, RELEASED, REFUNDED
+  createdAt            DateTime @default(now())
+
+  user                 User     @relation(fields: [userId], references: [id])
+  product              Product  @relation(fields: [productId], references: [id])
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  type      String
+  title     String
+  body      String
+  isRead    Boolean  @default(false)
+  channel   String   // PUSH, EMAIL
+  sentAt    DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model GameConfig {
+  key         String   @id
+  value       String
+  description String?
+}
